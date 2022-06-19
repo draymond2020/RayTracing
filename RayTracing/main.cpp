@@ -22,23 +22,34 @@
  5、展开后的方程是 t 的2元一次方程，可知：t = ( -b 加减 根号下 b^2 - 4ac ) / 2a，也就是说 b^2 - 4ac > 0 就有根，有根就有交点
  6、a系数 = (b * b) , b系数 = (2 * b * (A - C)), c系数 = (A - C) * (A - C) - r^2， A:射线原点，b:射线方向，C:球中心点，r:球半径
  **/
-bool hit_sphere(const point3& center, double radius, const ray& r) {
+double hit_sphere(const point3& center, double radius, const ray& r) {
     vec3 oc = r.origin() - center;
     auto a = dot(r.direction(), r.direction());
     auto b = 2.0 * dot(oc, r.direction());
     auto c = dot(oc, oc) - radius * radius;
     auto discriminant = b * b - 4 * a * c;
-    return discriminant > 0;
+    if(discriminant < 0) {
+        return -1.0;
+    } else {
+        return ((-b - sqrt(discriminant)) / (2.0 * a));
+    }
 }
 
 color ray_color(const ray& r) {
     vec3 centerPoint = point3(0, 0, -1);  // 相对于摄像机坐标系
-    if(hit_sphere(centerPoint, 0.5, r)) {
-        return vec3(1.0, 0.0, 0.0);
+    auto t = hit_sphere(centerPoint, 0.5, r);
+    if(t > 0.0) {
+        // 交点到球心的向量的单位化，即法线
+        vec3 N = unit_vector(r.at(t) - vec3(0, 0, -1));
+        // 单位法线转换到 0.0 - 1.0
+        double x = (N.x() - (-1.0)) / (1.0 - (-1.0));
+        double y = (N.y() - (-1.0)) / (1.0 - (-1.0));
+        double z = (N.z() - (-1.0)) / (1.0 - (-1.0));
+        return vec3(x, y, z);
     }
     vec3 unit_direction = unit_vector(r.direction());   // 单位化后 -1.0 < y < 1.0;
     // 根据公式：X - minX / maxX - minX 转换到 0 < t < 1.0
-    auto t = (unit_direction.y() - (-1.0)) / (1.0 - (-1.0));
+    t = (unit_direction.y() - (-1.0)) / (1.0 - (-1.0));
     // 线性插值 lerp,当t=0时是白色，t=1是蓝色
     return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
 }
