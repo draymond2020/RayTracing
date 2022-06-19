@@ -22,16 +22,36 @@
  5、展开后的方程是 t 的2元一次方程，可知：t = ( -b 加减 根号下 b^2 - 4ac ) / 2a，也就是说 b^2 - 4ac > 0 就有根，有根就有交点
  6、a系数 = (b * b) , b系数 = (2 * b * (A - C)), c系数 = (A - C) * (A - C) - r^2， A:射线原点，b:射线方向，C:球中心点，r:球半径
  **/
+
+/*
+优化相交算法， 推理
+( -b 加减 根号下 b^2 - 4ac ) / 2a  ， 设 b = 2h, h = dot(oc, r.direction())
+那么 (-2h 加减 根号下 (2h)^2 - 4 * a * c) / 2a  => (-h 加减 根号下 h^2 - a * c) / a
+    double hit_sphere(const point3& center, double radius, const ray& r) {
+        vec3 oc = r.origin() - center;
+        auto a = dot(r.direction(), r.direction());
+        auto b = 2.0 * dot(oc, r.direction());
+        auto c = dot(oc, oc) - radius * radius;
+        auto discriminant = b * b - 4 * a * c;
+        if(discriminant < 0) {
+            return -1.0;
+        } else {
+            return ((-b - sqrt(discriminant)) / (2.0 * a));
+        }
+    }
+*/
+
 double hit_sphere(const point3& center, double radius, const ray& r) {
     vec3 oc = r.origin() - center;
     auto a = dot(r.direction(), r.direction());
-    auto b = 2.0 * dot(oc, r.direction());
+    // auto b = 2.0 * dot(oc, r.direction());
+    auto h = dot(oc, r.direction());
     auto c = dot(oc, oc) - radius * radius;
-    auto discriminant = b * b - 4 * a * c;
+    auto discriminant = h * h - a * c;
     if(discriminant < 0) {
         return -1.0;
     } else {
-        return ((-b - sqrt(discriminant)) / (2.0 * a));
+        return ((-h - sqrt(discriminant)) / a);
     }
 }
 

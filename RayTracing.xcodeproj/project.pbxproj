@@ -27,6 +27,10 @@
 		04571BC8285D828F00696E32 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		04571BD9285DC64F00696E32 /* vec3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vec3.h; sourceTree = "<group>"; };
 		04571BDB285DD04E00696E32 /* common */ = {isa = PBXFileReference; lastKnownFileType = folder; path = common; sourceTree = "<group>"; };
+		0473D036285EE3C000CAF2EB /* hittable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hittable.h; sourceTree = "<group>"; };
+		0473D037285EE47C00CAF2EB /* sphere.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sphere.h; sourceTree = "<group>"; };
+		0473D038285EF88F00CAF2EB /* hittable_list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hittable_list.h; sourceTree = "<group>"; };
+		0473D039285EFBA500CAF2EB /* rtweekend.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rtweekend.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +66,10 @@
 				04571BDB285DD04E00696E32 /* common */,
 				04571BC8285D828F00696E32 /* main.cpp */,
 				04571BD9285DC64F00696E32 /* vec3.h */,
+				0473D036285EE3C000CAF2EB /* hittable.h */,
+				0473D037285EE47C00CAF2EB /* sphere.h */,
+				0473D038285EF88F00CAF2EB /* hittable_list.h */,
+				0473D039285EFBA500CAF2EB /* rtweekend.h */,
 			);
 			path = RayTracing;
 			sourceTree = "<group>";
