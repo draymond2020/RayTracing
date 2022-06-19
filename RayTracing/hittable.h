@@ -19,10 +19,11 @@ struct hit_record {
         front_face = dot(r.direction(), outward_normal) < 0;
         normal = front_face ? outward_normal : -outward_normal;
     }
-}
+};
 
 class hittable {
-    public bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const = 0;
-}
+public:
+    virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const = 0;
+};
 
 #endif /* hittable_h */

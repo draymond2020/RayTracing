@@ -14,14 +14,14 @@ public:
     sphere(){}
     sphere(point3 cen, double r) : center(cen), radius(r) {}
     
-    virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
+    virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const;
     
 public:
     point3 center;
     double radius;
 };
 
-bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const {
+bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) const {
     vec3 oc = r.origin() - center;
     auto a = dot(r.direction(), r.direction());
     auto h = dot(oc, r.direction());

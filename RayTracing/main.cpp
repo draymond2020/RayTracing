@@ -9,7 +9,9 @@
 #include "vec3.h"
 #include "common/color.h"
 #include "common/ray.h"
-
+#include "hittable_list.h"
+#include "sphere.h"
+#include "rtweekend.h"
 /*
  光线与球的相交算法
  球体方程：x^2 + y^2 + z^2 = R^2
@@ -54,7 +56,7 @@ double hit_sphere(const point3& center, double radius, const ray& r) {
         return ((-h - sqrt(discriminant)) / a);
     }
 }
-
+/*
 color ray_color(const ray& r) {
     vec3 centerPoint = point3(0, 0, -1);  // 相对于摄像机坐标系
     auto t = hit_sphere(centerPoint, 0.5, r);
@@ -70,6 +72,26 @@ color ray_color(const ray& r) {
     vec3 unit_direction = unit_vector(r.direction());   // 单位化后 -1.0 < y < 1.0;
     // 根据公式：X - minX / maxX - minX 转换到 0 < t < 1.0
     t = (unit_direction.y() - (-1.0)) / (1.0 - (-1.0));
+    // 线性插值 lerp,当t=0时是白色，t=1是蓝色
+    return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
+}
+*/
+
+color ray_color(const ray& r, const hittable_list& world) {
+    vec3 centerPoint = point3(0, 0, -1);  // 相对于摄像机坐标系
+    hit_record rec;
+    bool isHit = world.hit(r, 0, infinity, rec);
+    if(isHit) {
+        vec3 N = rec.normal;
+        // 单位法线转换到 0.0 - 1.0
+        double x = (N.x() - (-1.0)) / (1.0 - (-1.0));
+        double y = (N.y() - (-1.0)) / (1.0 - (-1.0));
+        double z = (N.z() - (-1.0)) / (1.0 - (-1.0));
+        return vec3(x, y, z);
+    }
+    vec3 unit_direction = unit_vector(r.direction());   // 单位化后 -1.0 < y < 1.0;
+    // 根据公式：X - minX / maxX - minX 转换到 0 < t < 1.0
+    auto t = (unit_direction.y() - (-1.0)) / (1.0 - (-1.0));
     // 线性插值 lerp,当t=0时是白色，t=1是蓝色
     return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
 }
@@ -106,6 +128,11 @@ int main(int argc, const char * argv[]) {
     const int image_width = 400;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
     
+    // world
+    hittable_list world;
+    world.add(make_shared<sphere>(point3(0, -100.5, -1), 100));
+    world.add(make_shared<sphere>(point3(0, 0, -1), 0.5));
+    
     // Camera
     auto viewport_height = 2.0;
     auto viewport_width = aspect_ratio * viewport_height;
@@ -127,7 +154,7 @@ int main(int argc, const char * argv[]) {
             auto v = double(j) / (image_height - 1);
             // 构建一条光线，原点，方向
             ray r(origin, lower_left_corner + u * horizontal + v * vertical - origin);
-            color pixel_color = ray_color(r);
+            color pixel_color = ray_color(r, world);
             write_color(std::cout, pixel_color);
         }
     }
