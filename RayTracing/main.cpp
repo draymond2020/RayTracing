@@ -160,7 +160,7 @@ int main(int argc, const char * argv[]) {
 //            color pixel_color = ray_color(r, world);
 //            write_color(std::cout, pixel_color);
             color pixel_color(0, 0, 0);
-            for (int s = 0; i < samples_per_pixel; ++s) {
+            for (int s = 0; s < samples_per_pixel; ++s) {
                 auto u = double(i + random_double()) / (image_width - 1);
                 auto v = double(j + random_double()) / (image_height - 1);
                 ray r = cam.get_ray(u, v);
