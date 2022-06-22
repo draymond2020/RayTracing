@@ -32,6 +32,7 @@
 		0473D038285EF88F00CAF2EB /* hittable_list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hittable_list.h; sourceTree = "<group>"; };
 		0473D039285EFBA500CAF2EB /* rtweekend.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rtweekend.h; sourceTree = "<group>"; };
 		0473D03A285F39D900CAF2EB /* camera.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = camera.h; sourceTree = "<group>"; };
+		048191032863532F007922D9 /* material.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = material.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +73,7 @@
 				0473D038285EF88F00CAF2EB /* hittable_list.h */,
 				0473D039285EFBA500CAF2EB /* rtweekend.h */,
 				0473D03A285F39D900CAF2EB /* camera.h */,
+				048191032863532F007922D9 /* material.h */,
 			);
 			path = RayTracing;
 			sourceTree = "<group>";
