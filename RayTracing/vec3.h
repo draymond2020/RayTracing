@@ -114,6 +114,7 @@ inline vec3 unit_vector(vec3 v) {
     return v / v.length();
 }
 
+// 在单位立方体中随机生成一个点，根据球公式 x^2 + y^2 + z^2 = 1，如果 x^2 + y^2 + z^2 >= 1 是球外
 inline vec3 random_in_unit_sphere() {
     while(true) {
         auto p = vec3::random(-1, 1);
@@ -122,4 +123,20 @@ inline vec3 random_in_unit_sphere() {
     }
 }
 
+inline vec3 random_unit_vector() {
+    // return unit_vector(random_in_unit_sphere());
+    auto a = random_double(0, 2*pi);
+    auto z = random_double(-1, 1);
+    auto r = sqrt(1 - z*z);
+    return vec3(r*cos(a), r*sin(a), z);
+}
+
+// 获取点的半球表面
+inline vec3 random_in_hemisphere(const vec3& normal) {
+    vec3 in_unit_sphere = random_in_unit_sphere();
+    if (dot(in_unit_sphere, normal) > 0.0) // In the same hemisphere as the normal
+        return in_unit_sphere;
+    else
+        return -in_unit_sphere;
+}
 #endif /* vec3_h */

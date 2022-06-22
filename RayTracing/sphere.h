@@ -27,13 +27,15 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
     auto h = dot(oc, r.direction());
     auto c = oc.length_squared() - radius*radius;
     auto discriminant = h * h - a * c;
+    // 如果函数无解则直接返回false
     if(discriminant < 0) {
         return false;
     }
+    auto sqrtd = sqrt(discriminant);
     // 找到t_min,t_max 范围内最小的root
-    auto root = ((-h - sqrt(discriminant)) / a);
+    auto root = ((-h - sqrtd) / a);
     if(root < t_min || t_max < root) {
-        root = ((-h + sqrt(discriminant)) / a);
+        root = ((-h + sqrtd) / a);
         if(root < t_min || t_max < root) {
             return false;
         }

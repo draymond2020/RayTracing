@@ -79,14 +79,14 @@ color ray_color(const ray& r) {
 */
 
 color ray_color(const ray& r, const hittable_list& world, int depth) {
-    vec3 centerPoint = point3(0, 0, -1);  // 相对于摄像机坐标系
     hit_record rec;
     // 递归深度，在最大深度不返回光的贡献
     if(depth <= 0) {
         return color(0.0, 0.0, 0.0);
     }
-    bool isHit = world.hit(r, 0, infinity, rec);
-    if(isHit) {
+    // 这里还有个不太重要的潜在bug。有些物体反射的光线会在t=0时再次击中自己。然而由于精度问题,
+    // 这个值可能是t=-0.000001或者是t=0.0000000001或者任意接近0的浮点数。所以我们要忽略掉0附近的一部分范围, 防止物体发出的光线再次与自己相交。
+    if(world.hit(r, 0.001, infinity, rec)) {
 //        vec3 N = rec.normal;
 //        // 单位法线转换到 0.0 - 1.0
 //        double x = (N.x() - (-1.0)) / (1.0 - (-1.0));
@@ -94,17 +94,23 @@ color ray_color(const ray& r, const hittable_list& world, int depth) {
 //        double z = (N.z() - (-1.0)) / (1.0 - (-1.0));
 //        return vec3(x, y, z);
         // 在p点的法线方向上的单位球内，随机生成一个目标点
-        point3 target = rec.p + rec.normal + random_in_unit_sphere();
+        // point3 target = rec.p + rec.normal + random_in_unit_sphere();
+        // 取p点法线方向球表面上的随机反射点
+        // point3 target = rec.p + rec.normal + random_unit_vector();
+        // 取p点法线半球上的随机反射点
+        point3 target = rec.p + random_in_hemisphere(rec.normal);
         // 看到物体的理论
         // 我们现实中之所以看到物体，是因为 我们从眼睛发出一条光线，经过和物体的相交后，然后弹射出去，会和光源相交
         // 想象下光是能量，根据光的可逆性，所以就有能量传播到我们的眼睛，这里是递归按照0.5倍能量的衰减，这里是直到没有和任何物体相交，返回背景的RGB能量
         // 可以看看渲染方程的讲解
-        return ray_color(ray(rec.p, target - rec.p), world, depth - 1);
+        return 0.5 * ray_color(ray(rec.p, target - rec.p), world, depth - 1);
     }
     vec3 unit_direction = unit_vector(r.direction());   // 单位化后 -1.0 < y < 1.0;
     // 根据公式：X - minX / maxX - minX 转换到 0 < t < 1.0
     auto t = (unit_direction.y() - (-1.0)) / (1.0 - (-1.0));
-    // printf("depth...%d\n", depth);
+    if(depth < 50) {
+//          printf("depth...%d\n", depth);
+    }
     // 线性插值 lerp,当t=0时是白色，t=1是蓝色
     return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
 }
