@@ -18,9 +18,10 @@ void write_color(std::ostream &out, color pixel_color, int samples_per_pixel) {
     
     // 求平均
     auto scale = 1.0 / samples_per_pixel;
-    r *= scale;
-    g *= scale;
-    b *= scale;
+    // 几乎所有的图像查看器都是有gama校正的，gama校正系数是2.2幂次方，这里直接开平方根处理
+    r = sqrt(scale * r);
+    g = sqrt(scale * g);
+    b = sqrt(scale * b);
     
     out << static_cast<int>(256 * clamp(r, 0.0, 0.999)) << ' '
          << static_cast<int>(256 * clamp(g, 0.0, 0.999)) << ' '

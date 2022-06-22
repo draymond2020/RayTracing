@@ -78,21 +78,33 @@ color ray_color(const ray& r) {
 }
 */
 
-color ray_color(const ray& r, const hittable_list& world) {
+color ray_color(const ray& r, const hittable_list& world, int depth) {
     vec3 centerPoint = point3(0, 0, -1);  // 相对于摄像机坐标系
     hit_record rec;
+    // 递归深度，在最大深度不返回光的贡献
+    if(depth <= 0) {
+        return color(0.0, 0.0, 0.0);
+    }
     bool isHit = world.hit(r, 0, infinity, rec);
     if(isHit) {
-        vec3 N = rec.normal;
-        // 单位法线转换到 0.0 - 1.0
-        double x = (N.x() - (-1.0)) / (1.0 - (-1.0));
-        double y = (N.y() - (-1.0)) / (1.0 - (-1.0));
-        double z = (N.z() - (-1.0)) / (1.0 - (-1.0));
-        return vec3(x, y, z);
+//        vec3 N = rec.normal;
+//        // 单位法线转换到 0.0 - 1.0
+//        double x = (N.x() - (-1.0)) / (1.0 - (-1.0));
+//        double y = (N.y() - (-1.0)) / (1.0 - (-1.0));
+//        double z = (N.z() - (-1.0)) / (1.0 - (-1.0));
+//        return vec3(x, y, z);
+        // 在p点的法线方向上的单位球内，随机生成一个目标点
+        point3 target = rec.p + rec.normal + random_in_unit_sphere();
+        // 看到物体的理论
+        // 我们现实中之所以看到物体，是因为 我们从眼睛发出一条光线，经过和物体的相交后，然后弹射出去，会和光源相交
+        // 想象下光是能量，根据光的可逆性，所以就有能量传播到我们的眼睛，这里是递归按照0.5倍能量的衰减，这里是直到没有和任何物体相交，返回背景的RGB能量
+        // 可以看看渲染方程的讲解
+        return ray_color(ray(rec.p, target - rec.p), world, depth - 1);
     }
     vec3 unit_direction = unit_vector(r.direction());   // 单位化后 -1.0 < y < 1.0;
     // 根据公式：X - minX / maxX - minX 转换到 0 < t < 1.0
     auto t = (unit_direction.y() - (-1.0)) / (1.0 - (-1.0));
+    // printf("depth...%d\n", depth);
     // 线性插值 lerp,当t=0时是白色，t=1是蓝色
     return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
 }
@@ -129,6 +141,8 @@ int main(int argc, const char * argv[]) {
     const int image_width = 400;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
     const int samples_per_pixel = 100;  // 每个像素采样100根光线
+    // 递归深度
+    const int max_depth = 50;
     
     // world
     hittable_list world;
@@ -164,7 +178,7 @@ int main(int argc, const char * argv[]) {
                 auto u = double(i + random_double()) / (image_width - 1);
                 auto v = double(j + random_double()) / (image_height - 1);
                 ray r = cam.get_ray(u, v);
-                pixel_color += ray_color(r, world);
+                pixel_color += ray_color(r, world, max_depth);
             }
             write_color(std::cout, pixel_color, samples_per_pixel);
         }

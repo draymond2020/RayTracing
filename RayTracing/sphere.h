@@ -23,9 +23,9 @@ public:
 
 bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) const {
     vec3 oc = r.origin() - center;
-    auto a = dot(r.direction(), r.direction());
+    auto a = r.direction().length_squared();
     auto h = dot(oc, r.direction());
-    auto c = dot(oc, oc) - radius * radius;
+    auto c = oc.length_squared() - radius*radius;
     auto discriminant = h * h - a * c;
     if(discriminant < 0) {
         return false;
