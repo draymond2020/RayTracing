@@ -13,6 +13,7 @@
 #include "sphere.h"
 #include "rtweekend.h"
 #include "camera.h"
+#include "material.h"
 /*
  光线与球的相交算法
  球体方程：x^2 + y^2 + z^2 = R^2
@@ -98,12 +99,17 @@ color ray_color(const ray& r, const hittable_list& world, int depth) {
         // 取p点法线方向球表面上的随机反射点
         // point3 target = rec.p + rec.normal + random_unit_vector();
         // 取p点法线半球上的随机反射点
-        point3 target = rec.p + random_in_hemisphere(rec.normal);
+        // point3 target = rec.p + random_in_hemisphere(rec.normal);
         // 看到物体的理论
         // 我们现实中之所以看到物体，是因为 我们从眼睛发出一条光线，经过和物体的相交后，然后弹射出去，会和光源相交
         // 想象下光是能量，根据光的可逆性，所以就有能量传播到我们的眼睛，这里是递归按照0.5倍能量的衰减，这里是直到没有和任何物体相交，返回背景的RGB能量
         // 可以看看渲染方程的讲解
-        return 0.5 * ray_color(ray(rec.p, target - rec.p), world, depth - 1);
+        // return 0.5 * ray_color(ray(rec.p, target - rec.p), world, depth - 1);
+        ray scattered;
+        color attenuation;
+        if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+            return attenuation * ray_color(scattered, world, depth - 1);
+        return color(0,0,0);
     }
     vec3 unit_direction = unit_vector(r.direction());   // 单位化后 -1.0 < y < 1.0;
     // 根据公式：X - minX / maxX - minX 转换到 0 < t < 1.0
@@ -152,8 +158,15 @@ int main(int argc, const char * argv[]) {
     
     // world
     hittable_list world;
-    world.add(make_shared<sphere>(point3(0, -100.5, -1), 100));
-    world.add(make_shared<sphere>(point3(0, 0, -1), 0.5));
+    auto material_ground = make_shared<lambertian>(color(0.8, 0.8, 0.0));
+    auto material_center = make_shared<lambertian>(color(0.7, 0.3, 0.3));
+    auto material_left   = make_shared<metal>(color(0.8, 0.8, 0.8));
+    auto material_right  = make_shared<metal>(color(0.8, 0.6, 0.2));
+
+    world.add(make_shared<sphere>(point3( 0.0, -100.5, -1.0), 100.0, material_ground));
+    world.add(make_shared<sphere>(point3( 0.0,    0.0, -1.0),   0.5, material_center));
+    world.add(make_shared<sphere>(point3(-1.0,    0.0, -1.0),   0.5, material_left));
+    world.add(make_shared<sphere>(point3( 1.0,    0.0, -1.0),   0.5, material_right));
     
     // Camera
 //    auto viewport_height = 2.0;

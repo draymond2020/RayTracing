@@ -55,6 +55,12 @@ class vec3 {
             return sqrt(length_squared());
         }
     
+        bool near_zero() const {
+            // 如果向量在所有维度上都非常接近于零，则返回 true。
+            const auto s = 1e-8;
+            return (fabs(e[0]) < s) && (fabs(e[1]) < s) && (fabs(e[2]) < s);
+        }
+    
         inline static vec3 random() {
             return vec3(random_double(), random_double(), random_double());
         }
@@ -138,5 +144,9 @@ inline vec3 random_in_hemisphere(const vec3& normal) {
         return in_unit_sphere;
     else
         return -in_unit_sphere;
+}
+
+vec3 reflect(const vec3& v, const vec3& n) {
+    return v - 2*dot(v,n)*n;
 }
 #endif /* vec3_h */
